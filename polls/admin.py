@@ -19,6 +19,7 @@ class QuestionAdmin(admin.ModelAdmin):
                 'classes': ['collapse']
             }
         ),
+        (None, {'fields': ['is_open']}),
     ]
     inlines = [ChoiceInline]
     list_display = ('question_text', 'pub_date', 'was_published_recently', 'is_open')
