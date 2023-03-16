@@ -1,5 +1,7 @@
 import datetime
+from io import StringIO
 
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -123,3 +125,21 @@ class QuestionDetailViewTests(TestCase):
         url = reverse('polls:detail', args=(past_question.id,))
         response = self.client.get(url)
         self.assertContains(response, past_question.question_text)
+
+
+class ClosepollTest(TestCase):
+    def test_poll_closure(self):
+        question_id = 1
+        create_question(question_text="Current Question.", days=0)
+        out = StringIO()
+        call_command("closepoll", question_id, stdout=out)
+        self.assertIn(f'Successfully closed poll "{question_id}"', out.getvalue())
+
+    def test_poll_deletion(self):
+        question_id = 1
+        create_question(question_text="Current Question.", days=0)
+        out = StringIO()
+        call_command("closepoll", question_id, "--delete", stdout=out)
+        self.assertIn(f'Successfully deleted poll "{question_id}"', out.getvalue())
+        with self.assertRaises(Question.DoesNotExist):
+            Question.objects.get(pk=question_id)
