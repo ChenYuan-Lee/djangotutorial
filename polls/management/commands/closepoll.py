@@ -16,7 +16,10 @@ class Command(BaseCommand):
             except Poll.DoesNotExist:
                 raise CommandError('Poll "%s" does not exist' % poll_id)
 
-            poll.opened = False
+            if not poll.is_open:
+                raise CommandError('Poll "%s" is already closed' % poll_id)
+            
+            poll.is_open = False
             poll.save()
 
             self.stdout.write(
